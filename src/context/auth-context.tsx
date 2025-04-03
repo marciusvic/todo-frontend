@@ -38,7 +38,10 @@ export default function AuthProvider({
   children: React.ReactNode;
 }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const token = localStorage.getItem("accessToken");
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    isTokenValid(token || "")
+  );
   const { login } = useAuthService();
 
   function isTokenValid(token: string): boolean {
