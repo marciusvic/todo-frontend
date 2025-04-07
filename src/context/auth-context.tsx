@@ -1,16 +1,6 @@
 import { useAuthService } from "@/services/auth-service";
+import { User } from "@/types/user";
 import { createContext, useContext, useEffect, useState } from "react";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  companiesId: string | null;
-  groupId: string | null;
-  brandsId: string | null;
-}
 
 interface AuthData {
   email: string;
@@ -72,7 +62,6 @@ export default function AuthProvider({
     try {
       const response = await login(authData.email, authData.password);
       const { access_token, user } = response.data;
-      console.log("entrei aq");
       if (isTokenValid(access_token)) {
         localStorage.setItem("accessToken", access_token);
         localStorage.setItem("currentUser", JSON.stringify(user));
