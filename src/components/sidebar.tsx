@@ -1,41 +1,123 @@
+import { JSX, useState } from "react";
+import {
+  CircleChevronRightIcon,
+  CircleChevronLeftIcon,
+  LayoutDashboard,
+  UserPlus,
+  LogOut,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
-import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+
+interface MenuItem {
+  title: string;
+  href: string;
+  icon: JSX.Element;
+  role?: "ADMIN" | "USER";
+}
 
 export function SideBar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const { signOut, currentUser: user } = useAuth();
-  const location = useLocation();
 
-  if (location.pathname === "/login") return null;
+  function handleSignOut() {
+    signOut();
+    navigate("/login");
+  }
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const menuItems: MenuItem[] = [
+    {
+      title: "Tarefas",
+      href: "/",
+      icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
+    },
+    {
+      title: "Criar tarefa",
+      href: "/create-task",
+      icon: <UserPlus className="h-5 w-5 mr-2" />,
+    },
+    {
+      title: "Admin",
+      href: "/admin",
+      icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
+      role: "ADMIN",
+    },
+  ];
 
   return (
-    <nav className="border-b">
-      <div className="flex h-16 items-center px-4 container mx-auto">
-        <Link to="/" className="font-bold text-xl">
-          Task Manager
-        </Link>
-        <div className="ml-auto flex items-center space-x-4">
-          <Link to="/">
-            <Button variant="ghost">Home</Button>
-          </Link>
-          <Link to="/create-task">
-            <Button variant="ghost">Create Task</Button>
-          </Link>
-          {user?.role === "ADMIN" && (
-            <Link to="/admin">
-              <Button variant="ghost">Admin</Button>
-            </Link>
-          )}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">
-              {user?.name} ({user?.role})
-            </span>
-            <Button variant="outline" onClick={signOut}>
-              Logout
-            </Button>
-          </div>
+    <>
+      <button
+        onClick={toggleMenu}
+        className="text-whitesec cursor-pointer p-2 hover:bg-gray-100 rounded-full items-center"
+        aria-label="Toggle menu"
+      >
+        <CircleChevronRightIcon className="h-6 w-6" />
+      </button>
+
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40 transition-opacity duration-300"
+          onClick={toggleMenu}
+        />
+      )}
+
+      <div
+        className={cn(
+          "fixed top-0 left-0 h-full w-full max-w-[293px] bg-gray-100 z-50 transition-transform duration-300 ease-in-out transform pt-10",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex justify-between items-center pr-5 pl-8">
+          <button
+            onClick={toggleMenu}
+            className="text-whitesec cursor-pointer p-2 hover:bg-gray-200 rounded-full items-center"
+            aria-label="Close menu"
+          >
+            <CircleChevronLeftIcon className="h-6 w-6" />
+          </button>
         </div>
+
+        <nav className="mt-8">
+          <ScrollArea className="flex-1 p-2 pt-0 space-y-2">
+            <div>
+              <ul className="space-y-2">
+                {menuItems.map((item) => {
+                  if (item.role && item.role !== user?.role) {
+                    return null;
+                  }
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        to={item.href}
+                        className="p-2 text-gray-950 hover:bg-primary/40 rounded-md transition-colors flex items-center space-x-2"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {item.icon}
+                        {item.title}
+                      </Link>
+                    </li>
+                  );
+                })}
+
+                <li
+                  onClick={handleSignOut}
+                  className="p-2 text-white hover:bg-primary/40 rounded-md transition-colors flex items-center space-x-2 cursor-pointer"
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Logout
+                </li>
+              </ul>
+            </div>
+          </ScrollArea>
+        </nav>
       </div>
-    </nav>
+    </>
   );
 }

@@ -1,5 +1,7 @@
 import PrivateRoute from "@/components/private-route";
 import PublicRoute from "@/components/public-route";
+import AdminPage from "@/pages/admin";
+import CreateTaskPage from "@/pages/create-task";
 import { HomePage } from "@/pages/home";
 import { LoginPage } from "@/pages/login";
 import { Suspense } from "react";
@@ -29,7 +31,7 @@ function AppRouter() {
           path="/create-task"
           element={
             <PrivateRoute>
-              <HomePage />
+              <CreateTaskPage />
             </PrivateRoute>
           }
         />
@@ -37,7 +39,7 @@ function AppRouter() {
           path="/admin"
           element={
             <PrivateRoute>
-              <HomePage />
+              <AdminPage />
             </PrivateRoute>
           }
         />

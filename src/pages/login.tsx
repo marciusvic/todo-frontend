@@ -72,7 +72,7 @@ export function LoginPage() {
                   <FormItem>
                     <FormLabel>E-mail</FormLabel>
                     <FormControl>
-                      <Input placeholder="email@exemplo.com" {...field} />
+                      <Input placeholder="email@olhar180.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -100,11 +100,13 @@ export function LoginPage() {
               </Button>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
+          {/**
+           <div className="mt-4 text-center text-sm">
             <p>Contas de demonstração:</p>
-            <p>Admin: admin@exemplo.com / admin123</p>
-            <p>Usuário: usuario@exemplo.com / usuario123</p>
+            <p>Admin: admin@olhar180.com / admin123</p>
+            <p>Usuário: user@olhar180.com / user123</p>
           </div>
+           */}
         </CardContent>
       </Card>
     </div>
