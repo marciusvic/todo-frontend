@@ -32,7 +32,7 @@ import { useTask } from "@/context/task-context";
 import { Priority } from "@/types/task";
 
 const taskSchema = z.object({
-  name: z
+  title: z
     .string()
     .min(3, { message: "O nome da tarefa deve ter pelo menos 3 caracteres" }),
   description: z
@@ -55,7 +55,7 @@ export default function CreateTaskPage() {
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      name: "",
+      title: "",
       description: "",
       dueDate: new Date().toISOString().split("T")[0],
       priority: "MEDIUM",
@@ -67,7 +67,7 @@ export default function CreateTaskPage() {
 
     try {
       const task = await createNewTask({
-        title: data.name,
+        title: data.title,
         description: data.description,
         dueDate: new Date(data.dueDate),
         priority: data.priority as Priority,
@@ -111,7 +111,7 @@ export default function CreateTaskPage() {
               >
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nome da Tarefa</FormLabel>

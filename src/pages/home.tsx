@@ -33,11 +33,17 @@ export function HomePage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const { tasks, deleteExistingTask, loading } = useTask();
+  const { tasks, deleteExistingTask, loading, updateExistingTask, fetchTasks } =
+    useTask();
   const navigate = useNavigate();
 
-  const handleDeleteTask = (taskId: number) => {
-    deleteExistingTask(taskId);
+  const handleToggleCompletion = (task: Task) => {
+    updateExistingTask(task.id, { completed: !task.completed });
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    await deleteExistingTask(taskId);
+    setIsDeleteDialogOpen(false);
   };
 
   const handleEditClick = (task: Task) => {
@@ -74,18 +80,12 @@ export function HomePage() {
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
-            <Skeleton className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]" />
+            {[...Array(12)].map((_, index) => (
+              <Skeleton
+                key={index}
+                className="text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm h-[150px]"
+              />
+            ))}
           </div>
         ) : tasks.length === 0 ? (
           <div className="text-center py-12">
@@ -137,7 +137,7 @@ export function HomePage() {
                     </DropdownMenu>
                   </div>
                   <CardTitle className={task.completed ? "line-through" : ""}>
-                    {task.name}
+                    {task.title}
                   </CardTitle>
                   <CardDescription>
                     Prazo: {new Date(task.dueDate).toLocaleDateString()}
@@ -157,7 +157,7 @@ export function HomePage() {
                     <Checkbox
                       id={`task-${task.id}`}
                       checked={task.completed}
-                      onCheckedChange={() => {}}
+                      onCheckedChange={() => handleToggleCompletion(task)}
                     />
                     <label
                       htmlFor={`task-${task.id}`}
@@ -179,7 +179,13 @@ export function HomePage() {
             <DialogTitle>Editar Tarefa</DialogTitle>
           </DialogHeader>
           {selectedTask && (
-            <TaskEditForm task={selectedTask} onTaskUpdated={() => {}} />
+            <TaskEditForm
+              task={selectedTask}
+              onTaskUpdated={() => {
+                setIsEditDialogOpen(false);
+                fetchTasks();
+              }}
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -191,7 +197,7 @@ export function HomePage() {
           </DialogHeader>
           <div className="py-4">
             <p>Tem certeza de que deseja excluir esta tarefa?</p>
-            <p className="font-medium mt-2">{selectedTask?.name}</p>
+            <p className="font-medium mt-2">{selectedTask?.title}</p>
           </div>
           <div className="flex justify-end gap-2">
             <Button

@@ -25,17 +25,17 @@ import type { Priority, Task } from "@/types/task";
 import { useTaskService } from "@/services/task-service";
 
 const taskSchema = z.object({
-  name: z
+  title: z
     .string()
-    .min(3, { message: "Task name must be at least 3 characters" }),
+    .min(3, { message: "O nome da tarefa deve ter pelo menos 3 caracteres" }),
   description: z
     .string()
-    .min(5, { message: "Description must be at least 5 characters" }),
+    .min(5, { message: "A descrição deve ter pelo menos 5 caracteres" }),
   dueDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: "Please enter a valid date",
+    message: "Por favor, insira uma data válida",
   }),
   priority: z.enum(["HIGH", "MEDIUM", "LOW"], {
-    required_error: "Please select a priority level",
+    required_error: "Por favor, selecione um nível de prioridade",
   }),
   completed: z.boolean().default(false).optional(),
 });
@@ -55,7 +55,7 @@ export default function TaskEditForm({
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      name: task.name,
+      title: task.title,
       description: task.description,
       dueDate: new Date(task.dueDate).toISOString().split("T")[0],
       priority: task.priority,
@@ -65,7 +65,7 @@ export default function TaskEditForm({
 
   async function onSubmit(data: TaskFormValues) {
     const updatedTask = await updateTask(task.id, {
-      title: data.name,
+      title: data.title,
       description: data.description,
       dueDate: new Date(data.dueDate),
       priority: data.priority as Priority,
@@ -81,12 +81,12 @@ export default function TaskEditForm({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="name"
+          name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Task Name</FormLabel>
+              <FormLabel>Nome da Tarefa</FormLabel>
               <FormControl>
-                <Input placeholder="Enter task name" {...field} />
+                <Input placeholder="Digite o nome da tarefa" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -98,10 +98,10 @@ export default function TaskEditForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Descrição</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Enter task description"
+                  placeholder="Digite a descrição da tarefa"
                   className="min-h-[100px]"
                   {...field}
                 />
@@ -117,7 +117,7 @@ export default function TaskEditForm({
             name="dueDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Due Date</FormLabel>
+                <FormLabel>Data de Entrega</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
                 </FormControl>
@@ -131,25 +131,22 @@ export default function TaskEditForm({
             name="priority"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Priority</FormLabel>
+                <FormLabel>Prioridade</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
+                      <SelectValue placeholder="Selecione a prioridade" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="HIGH">High</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="LOW">Low</SelectItem>
+                    <SelectItem value="HIGH">Alta</SelectItem>
+                    <SelectItem value="MEDIUM">Média</SelectItem>
+                    <SelectItem value="LOW">Baixa</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription>
-                  Set the importance level of this task
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -168,15 +165,17 @@ export default function TaskEditForm({
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>Completed</FormLabel>
-                <FormDescription>Mark this task as completed</FormDescription>
+                <FormLabel>Concluída</FormLabel>
+                <FormDescription>
+                  Marque esta tarefa como concluída
+                </FormDescription>
               </div>
             </FormItem>
           )}
         />
 
         <div className="flex justify-end gap-2">
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit">Salvar Alterações</Button>
         </div>
       </form>
     </Form>

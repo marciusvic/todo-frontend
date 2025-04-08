@@ -1,12 +1,15 @@
+import { User } from "./user";
+
 export interface Task {
   id: number;
-  name: string;
+  title: string;
   description: string;
   createdAt: Date;
   dueDate: Date;
   priority: "HIGH" | "MEDIUM" | "LOW";
   completed: boolean;
   userId: number;
+  User?: User;
 }
 
 export enum Priority {
@@ -23,7 +26,7 @@ export interface CreateTaskDto {
 }
 
 export interface UpdateTaskDto {
-  name?: string;
+  title?: string;
   description?: string;
   dueDate?: Date;
   priority?: Priority;

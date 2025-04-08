@@ -1,24 +1,27 @@
 import { useTaskService } from "@/services/task-service";
 import { CreateTaskDto, Task, UpdateTaskDto } from "@/types/task";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./auth-context";
 
 interface TaskContextType {
   tasks: Task[];
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  fetchTasks: () => Promise<void>;
   loading: boolean;
   createNewTask: (task: CreateTaskDto) => Promise<void>;
   updateExistingTask: (id: number, task: UpdateTaskDto) => Promise<void>;
   deleteExistingTask: (id: number) => Promise<void>;
+  adminTasks: Task[];
   fetchAdminTasks: () => Promise<void>;
 }
 
 export const TaskContext = createContext<TaskContextType>({
   tasks: [],
-  setTasks: () => {},
+  fetchTasks: async () => {},
   loading: false,
   createNewTask: async () => {},
   updateExistingTask: async () => {},
   deleteExistingTask: async () => {},
+  adminTasks: [],
   fetchAdminTasks: async () => {},
 });
 
@@ -28,9 +31,11 @@ export default function TaskProvider({
   children: React.ReactNode;
 }) {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [adminTasks, setAdminTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const { adminGetTasks, createTask, deleteTask, getTasks, updateTask } =
     useTaskService();
+  const { currentUser, isAuthenticated } = useAuth();
 
   async function fetchTasks() {
     setLoading(true);
@@ -61,9 +66,7 @@ export default function TaskProvider({
   async function updateExistingTask(id: number, task: UpdateTaskDto) {
     setLoading(true);
     try {
-      const response = await updateTask(id, task);
-      const { data } = response;
-      setTasks((prevTasks) => prevTasks.map((t) => (t.id === id ? data : t)));
+      await updateTask(id, task);
     } catch (error) {
       console.error("Error updating task:", error);
     } finally {
@@ -88,7 +91,7 @@ export default function TaskProvider({
     try {
       const response = await adminGetTasks();
       const { data } = response;
-      setTasks(data);
+      setAdminTasks(data);
     } catch (error) {
       console.error("Error fetching admin tasks:", error);
     } finally {
@@ -97,18 +100,24 @@ export default function TaskProvider({
   }
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (isAuthenticated && currentUser) {
+      fetchTasks();
+      if (currentUser.role === "ADMIN") {
+        fetchAdminTasks();
+      }
+    }
+  }, [isAuthenticated, currentUser]);
 
   return (
     <TaskContext.Provider
       value={{
         tasks,
-        setTasks,
+        fetchTasks,
         loading,
         createNewTask,
         updateExistingTask,
         deleteExistingTask,
+        adminTasks,
         fetchAdminTasks,
       }}
     >

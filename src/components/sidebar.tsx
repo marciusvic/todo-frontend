@@ -4,9 +4,8 @@ import {
   CircleChevronLeftIcon,
   LayoutDashboard,
   UserPlus,
-  LogOut,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -20,13 +19,7 @@ interface MenuItem {
 
 export function SideBar() {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
-  const { signOut, currentUser: user } = useAuth();
-
-  function handleSignOut() {
-    signOut();
-    navigate("/login");
-  }
+  const { currentUser: user } = useAuth();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -105,14 +98,6 @@ export function SideBar() {
                     </li>
                   );
                 })}
-
-                <li
-                  onClick={handleSignOut}
-                  className="p-2 text-white hover:bg-primary/40 rounded-md transition-colors flex items-center space-x-2 cursor-pointer"
-                >
-                  <LogOut className="h-5 w-5 mr-2" />
-                  Logout
-                </li>
               </ul>
             </div>
           </ScrollArea>

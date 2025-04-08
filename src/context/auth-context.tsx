@@ -68,7 +68,6 @@ export default function AuthProvider({
 
         setCurrentUser(user);
         setIsAuthenticated(true);
-        console.log("User signed in successfully");
       } else {
         throw new Error("Invalid token received");
       }
@@ -77,7 +76,6 @@ export default function AuthProvider({
       setIsAuthenticated(false);
     }
   }
-
   function signOut() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("currentUser");
